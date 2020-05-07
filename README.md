@@ -1,7 +1,7 @@
 # Example VPC with AWS 
 
 Example of running a VPC on AWS using CloudFormation
-* The blog post can be found [here](https://medium.com).
+* The blog post can be found [here](https://medium.com/@t3chflicks/virtual-private-cloud-on-aws-quickstart-with-cloudformation-4583109b2433).
 
 ![architecture](./architecture.png)
 
