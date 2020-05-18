@@ -6,7 +6,7 @@ Resources:
   VPC:
     Type: AWS::EC2::VPC
     Properties:
-      CidrBlock: "10.0.0.0/8"
+      CidrBlock: "10.0.0.0/16"
       EnableDnsHostnames: true
       EnableDnsSupport: true
 
@@ -15,7 +15,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: "10.1.0.0/16"
+      CidrBlock: "10.0.1.0/24"
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select
         - 0
@@ -25,7 +25,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: "10.2.0.0/16"
+      CidrBlock: "10.0.2.0/24"
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select
         - 1
@@ -35,7 +35,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: "10.3.0.0/16"
+      CidrBlock: "10.0.3.0/24"
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select
         - 2
@@ -46,7 +46,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: "10.4.0.0/16"
+      CidrBlock: "10.0.4.0/24"
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref AWS::Region
@@ -55,7 +55,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: "10.5.0.0/16"
+      CidrBlock: "10.0.5.0/24"
       AvailabilityZone: !Select
         - 1
         - Fn::GetAZs: !Ref AWS::Region
@@ -64,7 +64,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: "10.6.0.0/16"
+      CidrBlock: "10.0.6.0/24"
       AvailabilityZone: !Select
         - 2
         - Fn::GetAZs: !Ref AWS::Region
@@ -126,21 +126,21 @@ Resources:
     Type: AWS::EC2::NatGateway
     Properties:
       SubnetId: !Ref PrivateSubA
-      AllocationId: !Ref ElasticIPNatGatewayPrivateA
+      AllocationId: !GetAtt ElasticIPNatGatewayPrivateA.AllocationId
 
   # Optimisation - Step 1. Comment out this entire resource
   NatGatewayPrivateB:
     Type: AWS::EC2::NatGateway
     Properties:
       SubnetId: !Ref PrivateSubB
-      AllocationId: !Ref ElasticIPNatGatewayPrivateB
+      AllocationId: !GetAtt ElasticIPNatGatewayPrivateB.AllocationId
 
   # Optimisation - Step 1. Comment out this entire resource
   NatGatewayPrivateC:
     Type: AWS::EC2::NatGateway
     Properties:
       SubnetId: !Ref PrivateSubC
-      AllocationId: !Ref ElasticIPNatGatewayPrivateC
+      AllocationId: !GetAtt ElasticIPNatGatewayPrivateC.AllocationId
 
   RouteTablePrivateA:
     Type: AWS::EC2::RouteTable
@@ -163,7 +163,7 @@ Resources:
     Type: AWS::EC2::Route
     Properties:
       DestinationCidrBlock: "0.0.0.0/0"
-      InstanceId: !Ref NatGatewayPrivateA
+      NatGatewayId: !Ref NatGatewayPrivateA
       RouteTableId: !Ref RouteTablePrivateA
 
   RouteTableAssocSubnetPrivateA:
@@ -186,32 +186,32 @@ Resources:
       RouteTableId: !Ref RouteTablePrivateC # Optimisation - Step 1. Comment out this line
       SubnetId: !Ref PrivateSubC
 
-Outputs:
-  VPCID:
-    Value: !Ref VPC
-    Export:
-      Name: VPCID
-  PublicSubnetA:
-    Value: !Ref PublicSubA
-    Export:
-      Name: PublicSubnetA
-  PublicSubnetB:
-    Value: !Ref PublicSubB
-    Export:
-      Name: PublicSubnetB
-  PublicSubnetC:
-    Value: !Ref PublicSubC
-    Export:
-      Name: PublicSubnetC
-  PrivateSubnetA:
-    Value: !Ref PrivateSubA
-    Export:
-      Name: PrivateSubnetA
-  PrivateSubnetB:
-    Value: !Ref PrivateSubB
-    Export:
-      Name: PrivateSubnetB
-  PrivateSubnetC:
-    Value: !Ref PrivateSubC
-    Export:
-      Name: PrivateSubnetC
+# Outputs:
+#   VPCID:
+#     Value: !Ref VPC
+#     Export:
+#       Name: VPCID
+#   PublicSubnetA:
+#     Value: !Ref PublicSubA
+#     Export:
+#       Name: PublicSubnetA
+#   PublicSubnetB:
+#     Value: !Ref PublicSubB
+#     Export:
+#       Name: PublicSubnetB
+#   PublicSubnetC:
+#     Value: !Ref PublicSubC
+#     Export:
+#       Name: PublicSubnetC
+#   PrivateSubnetA:
+#     Value: !Ref PrivateSubA
+#     Export:
+#       Name: PrivateSubnetA
+#   PrivateSubnetB:
+#     Value: !Ref PrivateSubB
+#     Export:
+#       Name: PrivateSubnetB
+#   PrivateSubnetC:
+#     Value: !Ref PrivateSubC
+#     Export:
+#       Name: PrivateSubnetC
