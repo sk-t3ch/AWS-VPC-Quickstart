@@ -10,5 +10,5 @@
 
 # Deployment
 ```
-aws cloudformation create-stack --stack-name vpc --template-body file://tempalte.yml --capabilities CAPABILITY_NAMED_IAM
+aws cloudformation create-stack --stack-name vpc --template-body file://template.yml --capabilities CAPABILITY_NAMED_IAM
 ````
