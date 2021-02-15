@@ -34,22 +34,99 @@ The full template can be found [here](https://github.com/sk-t3ch/AWS-VPC).
 
 To begin, the simplest VPC:
 
+    VPC:
+        Type: AWS::EC2::VPC
+        Properties:
+        CidrBlock: "10.0.0.0/16"
 
 
 The only property we are required to provide is the `CidrBlock`, a range of IP addresses that you declare available for use in the network.
 
 The next step is to add subnets to the VPC. These occupy sections of the range of IPs in the VPC. You are required to configure `CidrBlock` which in this case is `10.0.1.0/24` meaning that we can use the addresses in the range `10.0.1.0 — 10.0.1.255` .
 
-
+    Subnet:
+        Type: AWS::EC2::Subnet
+        Properties:
+        VpcId: !Ref VPC
+        CidrBlock: "10.0.1.0/24"
 
 The component required to enable access from a subnet to the internet is an Internet Gateway. This sits at the edge of the VPC and orchestrates any traffic routed from or to them with the internet.
 
 The following template configures a public subnet:
 
+    PublicSubA:
+        Type: AWS::EC2::Subnet
+        Properties:
+        VpcId: !Ref VPC
+        CidrBlock: "10.0.1.0/24"
+        AvailabilityZone: !Select
+            - 0
+            - Fn::GetAZs: !Ref AWS::Region
+            
+    InternetGateway:
+        Type: AWS::EC2::InternetGateway
+        
+    GatewayAttachment:
+        Type: AWS::EC2::VPCGatewayAttachment
+        Properties:
+        VpcId: !Ref VPC
+        InternetGatewayId: !Ref InternetGateway
+        
+    RouteTablePublic:
+        Type: AWS::EC2::RouteTable
+        Properties:
+        VpcId: !Ref VPC
+        
+    RoutePublic:
+        Type: AWS::EC2::Route
+        Properties:
+        DestinationCidrBlock: "0.0.0.0/0"
+        GatewayId: !Ref InternetGateway
+        RouteTableId: !Ref RouteTablePublic
 
+    RouteTableAssocSubnetPublicA:
+        Type: AWS::EC2::SubnetRouteTableAssociation
+        Properties:
+        RouteTableId: !Ref RouteTablePublic
+        SubnetId: !Ref PublicSubA
 
 A private subnet is not directly accessible from the internet. However, it is possible to access the internet from a private subnet using a NAT Gateway. An Elastic IP is required because the NatGateway is not automatically assigned a public IP.
 
+    PrivateSubA:
+        Type: AWS::EC2::Subnet
+        Properties:
+        VpcId: !Ref VPC
+        CidrBlock: "10.0.4.0/24"
+        AvailabilityZone: !Select
+            - 0
+            - Fn::GetAZs: !Ref AWS::Region
+            
+    ElasticIPNatGatewayPrivateA:
+        Type: AWS::EC2::EIP
+        
+    NatGatewayPrivateA:
+        Type: AWS::EC2::NatGateway
+        Properties:
+        SubnetId: !Ref PrivateSubA
+        AllocationId: !Ref ElasticIPNatGatewayPrivateA
+        
+    RouteTablePrivateA:
+        Type: AWS::EC2::RouteTable
+        Properties:
+        VpcId: !Ref VPC
+        
+    RoutePrivate:
+        Type: AWS::EC2::Route
+        Properties:
+        DestinationCidrBlock: "0.0.0.0/0"
+        InstanceId: !Ref NatGatewayPrivateA
+        RouteTableId: !Ref RouteTablePrivateA
+        
+    RouteTableAssocSubnetPrivateA:
+        Type: AWS::EC2::SubnetRouteTableAssociation
+        Properties:
+        RouteTableId: !Ref RouteTablePrivateA
+        SubnetId: !Ref PrivateSubA
 
 
 Availability Zones (AZs) are groups of data centres inside a Region that are isolated from the failure of another AZ. Each subnet created in a VPC must be placed in a single AZ and a system can be protected from an AZ failure by utilising multiple AZ architecture — you’re recommended to have three public and three private subnets spanning different AZ zones. A VPC template for this can be found [here](https://github.com/sk-t3ch/AWS-VPC).
