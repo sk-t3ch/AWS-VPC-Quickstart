@@ -1,9 +1,15 @@
 # [T3chFlicks](https://t3chflicks.org): Quickstart VPC with AWS 
 > Quickstart for running a VPC on AWS using CloudFormation
-
-### Read The Blog Post ([github](./blog_post.md)/[medium](https://medium.com/@t3chflicks/virtual-private-cloud-on-aws-quickstart-with-cloudformation-4583109b2433)).
+![thumbnail](./thumbnail.png)
 
 ---
+
+## `tutorials/`
+
+[![Generic badge](https://img.shields.io/badge/Blog_Post-Github-orange.svg)](./blog_post.md)
+
+[![Generic badge](https://img.shields.io/badge/Blog_Post-Medium-blue.svg)](https://medium.com/@t3chflicks/virtual-private-cloud-on-aws-quickstart-with-cloudformation-4583109b2433)
+
 
 ## Architecture
 >![architecture](./architecture.png)
